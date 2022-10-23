@@ -1,0 +1,46 @@
+require("dotenv").config()
+const fs = require("fs")
+const { network, ethers } = require("hardhat")
+
+const FRONT_END_ADDESSES = "../constants/"
+
+module.exports = async function () {
+    if (process.env.UPDATE_FRONT_END) {
+        console.log("Updateing fron end")
+        updateContractAddresses()
+        updateAbi("RewardToken", "rewardTokenAbi")
+        updateAbi("Staking", "stakingAbi")
+    }
+}
+
+async function updateContractAddresses() {
+    //updateConctract("RewardToken", "rewardTokenMapping")
+    //updateConctract("Staking", "stakingMapping")
+}
+
+async function updateConctract(name, fileName) {
+    const chainId = network.config.chainId
+    const contract = await ethers.getContract(name)
+    console.log(`${FRONT_END_ADDESSES}${fileName}.json`)
+    const currentAddresses = JSON.parse(
+        fs.readFileSync(`${FRONT_END_ADDESSES}${fileName}.json`, "utf8")
+    )
+    if (chainId.toString() in currentAddresses) {
+        if (!currentAddresses[chainId.toString()].includes(contract.address)) {
+            currentAddresses[chainId.toString()].push(contract.address)
+        }
+    } else {
+        currentAddresses[chainId.toString()] = [contract.address]
+    }
+    fs.writeFileSync(`${FRONT_END_ADDESSES}${fileName}.json`, JSON.stringify(currentAddresses))
+}
+
+async function updateAbi(name, fileName) {
+    const contract = await ethers.getContract(name)
+    fs.writeFileSync(
+        `${FRONT_END_ADDESSES}${fileName}.json`,
+        contract.interface.format(ethers.utils.FormatTypes.json)
+    )
+}
+
+module.exports.tags = ["all", "frontend"]
