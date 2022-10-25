@@ -26,14 +26,12 @@ const client = createClient({
 
 function MyApp({ Component, pageProps }) {
     return (
-        <div>
-            <WagmiConfig client={client}>
-                <RainbowKitProvider chains={chains}>
-                    <Header />
-                    <Component {...pageProps} />
-                </RainbowKitProvider>
-            </WagmiConfig>
-        </div>
+        <WagmiConfig client={client}>
+            <RainbowKitProvider chains={chains}>
+                <Header />
+                <Component {...pageProps} />
+            </RainbowKitProvider>
+        </WagmiConfig>
     )
 }
 
